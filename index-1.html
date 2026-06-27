@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>💖 I Have a Question For You…</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ── TOKENS ─────────────────────────────────── */
+:root{
+  --p0:#fff0f6;--p1:#ffe0ef;--p2:#ffb8d9;--p3:#ff85be;
+  --p4:#e8488a;--p5:#c2185b;--rose:#f06292;--cream:#fffafc;
+  --glass:rgba(255,255,255,0.22);--gb:rgba(255,255,255,0.5);
+  --sh:0 8px 40px rgba(200,70,120,0.18);
+  --shd:0 20px 60px rgba(200,70,120,0.28);
+  --fd:'Playfair Display',serif;--fb:'Nunito',sans-serif;
+  --spring:cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* ── RESET ──────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:var(--fb);background:var(--p0);-webkit-font-smoothing:antialiased}
+
+/* ── CANVAS ─────────────────────────────────── */
+#cv{position:fixed;inset:0;pointer-events:none;z-index:0}
+
+/* ── SCREENS ────────────────────────────────── */
+.screen{
+  position:fixed;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#ffe4ef 0%,#ffd0e8 35%,#fce4ec 65%,#f8bbd0 100%);
+  opacity:0;pointer-events:none;
+  transition:opacity .55s ease,transform .55s ease;
+  z-index:1;overflow-y:auto;overflow-x:hidden;
+}
+.screen.active{opacity:1;pointer-events:all}
+.screen.out{opacity:0;transform:scale(.97) translateY(8px)}
+
+/* ── FLOATING DECO ROSES ────────────────────── */
+.rose-deco{position:fixed;font-size:clamp(1.4rem,3vw,2.2rem);pointer-events:none;z-index:2;animation:roseFloat 5s ease-in-out infinite;opacity:.8}
+.rd1{top:3%;left:3%;animation-delay:0s}
+.rd2{top:3%;left:18%;animation-delay:.7s}
+.rd3{top:3%;right:3%;animation-delay:1.4s}
+.rd4{bottom:3%;left:3%;animation-delay:2.1s}
+.rd5{bottom:3%;right:18%;animation-delay:2.8s}
+.rd6{bottom:3%;right:3%;animation-delay:3.5s}
+.rd7{top:45%;left:1%;animation-delay:1s;font-size:1.4rem}
+.rd8{top:45%;right:1%;animation-delay:2s;font-size:1.4rem}
+@keyframes roseFloat{0%,100%{transform:translateY(0)rotate(0deg)}50%{transform:translateY(-14px)rotate(10deg)}}
+
+/* ── LANDING CONTENT ────────────────────────── */
+.land-wrap{
+  position:relative;z-index:3;
+  display:flex;flex-direction:column;align-items:center;gap:2.2rem;
+  padding:2rem 1rem 3rem;
+  animation:wrapIn .8s var(--spring) both;
+}
+@keyframes wrapIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── BEAR ───────────────────────────────────── */
+.bear-outer{display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.bear-emoji{
+  font-size:clamp(5rem,13vw,8rem);
+  filter:drop-shadow(0 10px 30px rgba(200,70,120,.3));
+  animation:bearFloat 3.5s ease-in-out infinite;
+  display:block;line-height:1;
+  cursor:default;
+}
+@keyframes bearFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+
+.sign-box{
+  background:rgba(255,255,255,.92);
+  border:2.5px solid var(--p2);
+  border-radius:18px;
+  padding:1rem 1.8rem;
+  text-align:center;
+  box-shadow:var(--shd);
+  position:relative;
+  max-width:min(360px,88vw);
+  animation:signIn .9s .2s var(--spring) both;
+}
+@keyframes signIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+.sign-box::before{
+  content:'';position:absolute;top:-15px;left:50%;transform:translateX(-50%);
+  border:8px solid transparent;border-bottom-color:var(--p2);
+}
+.sign-box::after{
+  content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  border:7px solid transparent;border-bottom-color:rgba(255,255,255,.92);
+}
+.sign-text{
+  font-family:var(--fd);font-size:clamp(1.1rem,3.5vw,1.5rem);
+  color:var(--p5);font-style:italic;line-height:1.5;
+}
+.sign-sub{margin-top:.4rem;font-size:.82rem;color:var(--rose);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+
+.bear-shadow{width:90px;height:14px;background:radial-gradient(ellipse,rgba(200,80,120,.2),transparent 70%);border-radius:50%;animation:shPulse 3.5s ease-in-out infinite}
+@keyframes shPulse{0%,100%{transform:scaleX(1);opacity:.8}50%{transform:scaleX(.65);opacity:.35}}
+
+/* ── BUTTONS ────────────────────────────────── */
+.btn-row{
+  display:flex;gap:1.4rem;flex-wrap:wrap;
+  justify-content:center;
+  position:relative;min-height:60px;width:min(320px,88vw);
+}
+.btn{
+  border:none;cursor:pointer;font-family:var(--fb);
+  font-size:1rem;font-weight:800;border-radius:50px;
+  padding:.85rem 2.2rem;
+  transition:transform .18s var(--spring),box-shadow .18s;
+  user-select:none;letter-spacing:.03em;
+}
+.btn-yes{
+  background:linear-gradient(135deg,var(--rose),var(--p5));
+  color:#fff;box-shadow:0 5px 24px rgba(224,72,137,.45);
+  animation:btnIn .7s .6s var(--spring) both;
+}
+.btn-yes:hover{transform:scale(1.1) translateY(-2px);box-shadow:0 10px 36px rgba(224,72,137,.55)}
+.btn-yes:active{transform:scale(.96)}
+.btn-yes:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+
+.btn-no{
+  background:#fff;color:var(--p4);
+  border:2px solid var(--p2);
+  box-shadow:0 4px 14px rgba(200,100,140,.15);
+  position:fixed;transition:none;
+  animation:btnIn .7s .8s var(--spring) both;
+  z-index:999;
+}
+@keyframes btnIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:scale(1)}}
+
+/* ── HINT ───────────────────────────────────── */
+.hint-text{font-size:.75rem;color:#c47099;font-style:italic;opacity:0;animation:fadeHint 1s 3s forwards;letter-spacing:.04em}
+@keyframes fadeHint{to{opacity:.7}}
+
+/* ── SCREEN INNER ───────────────────────────── */
+.s-inner{
+  width:min(520px,92vw);
+  padding:2rem 1.5rem 3rem;
+  display:flex;flex-direction:column;align-items:center;gap:1.8rem;
+  position:relative;z-index:3;
+}
+.s-head{text-align:center}
+.s-icon{font-size:3rem;display:block;margin-bottom:.5rem;animation:bounce 2s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.s-title{font-family:var(--fd);font-size:clamp(1.6rem,5vw,2.3rem);color:var(--p5);line-height:1.2}
+.s-title .hi{color:var(--rose);font-style:italic}
+.s-sub{margin-top:.5rem;color:#ad5174;font-size:1rem;font-weight:300}
+
+/* ── CALENDAR ───────────────────────────────── */
+.cal-card{
+  background:var(--glass);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1.5px solid var(--gb);border-radius:24px;
+  padding:1.5rem;box-shadow:var(--shd);
+  width:100%;max-width:380px;
+}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.cal-arr{
+  background:none;border:1.5px solid var(--p2);color:var(--p4);
+  width:38px;height:38px;border-radius:50%;cursor:pointer;
+  font-size:1.3rem;display:flex;align-items:center;justify-content:center;
+  transition:background .2s,transform .15s;
+}
+.cal-arr:hover{background:var(--p1);transform:scale(1.1)}
+.cal-month{font-family:var(--fd);font-size:1.15rem;color:var(--p5);font-weight:700}
+.cal-wdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:.72rem;font-weight:700;color:var(--rose);letter-spacing:.06em;margin-bottom:.5rem}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cday{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;font-size:.88rem;cursor:pointer;color:#7b3a5a;
+  transition:background .15s,transform .15s,color .15s;font-weight:400;
+}
+.cday:hover:not(.empty):not(.past){background:var(--p1);transform:scale(1.15)}
+.cday.sel{
+  background:linear-gradient(135deg,var(--rose),var(--p5));
+  color:#fff;font-weight:700;
+  box-shadow:0 4px 14px rgba(200,70,120,.4);
+  transform:scale(1.2)!important;
+}
+.cday.today{border:2px solid var(--rose)}
+.cday.past{opacity:.28;cursor:default;pointer-events:none}
+.cday.empty{pointer-events:none}
+.cal-lbl{text-align:center;margin-top:1rem;color:var(--p4);font-family:var(--fd);font-style:italic;font-size:.95rem;min-height:1.4rem}
+
+/* ── DATE CARDS ─────────────────────────────── */
+.dcards{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;width:100%;max-width:460px}
+.dcard{
+  background:var(--glass);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1.5px solid var(--gb);border-radius:20px;
+  padding:1.3rem 1rem 1.5rem;text-align:center;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:transform .2s var(--spring),border-color .2s,box-shadow .2s;
+  box-shadow:0 4px 18px rgba(200,70,120,.1);
+}
+.dcard:hover{transform:translateY(-5px) scale(1.04);border-color:var(--rose);box-shadow:var(--sh)}
+.dcard.pick{
+  border-color:var(--p4);
+  background:rgba(255,133,184,.2);
+  box-shadow:0 0 0 3px rgba(224,72,137,.3),var(--shd);
+  transform:scale(1.06)!important;
+}
+.dcard-em{font-size:2.3rem;margin-bottom:.5rem;display:block}
+.dcard-ttl{font-family:var(--fd);font-size:.93rem;color:var(--p5);font-weight:700;margin-bottom:.3rem}
+.dcard-desc{font-size:.72rem;color:#ad5174;line-height:1.45;font-weight:300}
+.dcard-glow{
+  position:absolute;inset:0;border-radius:20px;opacity:0;
+  background:radial-gradient(circle at 50% 50%,rgba(240,98,146,.25),transparent 70%);
+  transition:opacity .3s;pointer-events:none;
+}
+.dcard.pick .dcard-glow{opacity:1}
+
+/* ── FINAL ──────────────────────────────────── */
+.final-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;
+  padding:2rem 1rem;position:relative;z-index:3;
+}
+.final-card{
+  background:rgba(255,255,255,.65);
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  border:2px solid rgba(255,255,255,.75);
+  border-radius:28px;padding:2.5rem 2rem 2rem;
+  text-align:center;box-shadow:var(--shd);
+  max-width:min(480px,92vw);width:100%;
+  animation:cardPop .8s var(--spring) both;
+}
+@keyframes cardPop{from{opacity:0;transform:scale(.65) translateY(40px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.final-rib{font-size:3rem;display:block;margin-bottom:.5rem;animation:ribSpin 2.5s ease-in-out infinite}
+@keyframes ribSpin{0%,100%{transform:rotate(-10deg) scale(1)}50%{transform:rotate(10deg) scale(1.15)}}
+.final-title{font-family:var(--fd);font-size:clamp(1.9rem,6vw,2.8rem);color:var(--p5);font-style:italic;margin-bottom:.8rem}
+.final-msg{color:var(--p4);font-size:1rem;line-height:1.7;font-weight:300}
+.final-det{
+  margin:1.2rem 0;padding:1rem 1.4rem;
+  background:rgba(255,182,210,.18);
+  border-radius:14px;border:1.5px solid var(--p1);
+  font-size:.95rem;color:var(--p5);
+  font-family:var(--fd);font-style:italic;line-height:1.7;
+}
+.final-quote{
+  margin:1rem 0 1.4rem;font-size:.85rem;
+  color:#ad5174;font-style:italic;line-height:1.7;font-weight:300;
+  border-top:1px solid var(--p1);padding-top:1rem;
+}
+.music-btn{
+  display:inline-block;cursor:pointer;
+  padding:.4rem 1.2rem;border:1.5px solid var(--p2);
+  border-radius:50px;font-size:.8rem;color:var(--p4);
+  margin-bottom:1rem;transition:background .2s,transform .15s;
+  user-select:none;font-family:var(--fb);font-weight:600;
+}
+.music-btn:hover{background:var(--p1);transform:scale(1.05)}
+.btn-replay{
+  background:linear-gradient(135deg,#f48fb1,var(--p4));
+  color:#fff;padding:.8rem 2.2rem;
+  box-shadow:0 4px 18px rgba(200,70,120,.35);
+}
+
+.fhearts{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+
+/* ── TOAST ──────────────────────────────────── */
+.toast{
+  position:fixed;bottom:1.5rem;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(14px);
+  border:1.5px solid var(--p2);border-radius:50px;
+  padding:.7rem 1.8rem;font-size:.85rem;color:var(--p5);
+  font-family:var(--fd);font-style:italic;
+  box-shadow:var(--sh);z-index:10000;
+  transition:transform .4s var(--spring),opacity .4s;
+  white-space:nowrap;opacity:0;pointer-events:none;
+  max-width:90vw;text-align:center;
+}
+.toast.on{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ── SECRET OVERLAY ─────────────────────────── */
+.secret-ov{
+  position:fixed;inset:0;
+  background:rgba(40,0,20,.7);
+  backdrop-filter:blur(8px);
+  z-index:9999;display:flex;
+  align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .4s;
+}
+.secret-ov.open{opacity:1;pointer-events:all}
+.secret-card{
+  background:#15000d;
+  border:2px solid var(--p3);border-radius:24px;
+  padding:2.5rem 2rem;text-align:center;
+  max-width:min(420px,90vw);
+  box-shadow:0 0 80px rgba(240,98,146,.5);
+  animation:secretPop .5s var(--spring) both;
+}
+@keyframes secretPop{from{transform:scale(.7)}to{transform:scale(1)}}
+.sc-em{font-size:3rem;margin-bottom:.8rem}
+.sc-ttl{font-family:var(--fd);font-size:1.45rem;color:var(--p2);margin-bottom:.5rem}
+.sc-sub{color:#e8a0c0;font-size:.9rem;margin-bottom:1.3rem;line-height:1.6}
+.sc-code{
+  background:#0a0007;border-radius:12px;
+  padding:1rem 1.3rem;text-align:left;
+  font-family:'Courier New',monospace;font-size:.8rem;
+  display:flex;flex-direction:column;gap:.3rem;
+  border:1px solid rgba(255,100,180,.2);
+}
+.cl{color:#e8a0c0}.kw{color:#ff79c6}.st{color:#f1fa8c}.cm{color:#6272a4}
+.sc-close{
+  margin-top:1.5rem;
+  background:linear-gradient(135deg,var(--rose),var(--p5));
+  color:#fff;border:none;border-radius:50px;
+  padding:.7rem 2rem;cursor:pointer;
+  font-family:var(--fb);font-weight:700;font-size:.95rem;
+  transition:transform .2s;
+}
+.sc-close:hover{transform:scale(1.07)}
+
+/* ── KEYFRAMES ──────────────────────────────── */
+@keyframes floatUp{
+  0%{transform:translateX(0) translateY(0) rotate(0deg);opacity:.95}
+  100%{transform:translateX(var(--dx,20px)) translateY(-115vh) rotate(var(--rot,360deg));opacity:0}
+}
+@keyframes hBurst{
+  0%{transform:translate(0,0) scale(.4);opacity:1}
+  100%{transform:translate(var(--bx),var(--by)) scale(1.5);opacity:0}
+}
+@keyframes ripOut{
+  0%{transform:scale(0);opacity:.8}
+  100%{transform:scale(14);opacity:0}
+}
+
+/* ── RESPONSIVE ─────────────────────────────── */
+@media(max-width:480px){
+  .dcards{gap:.6rem}
+  .dcard{padding:1rem .8rem 1.2rem}
+  .dcard-em{font-size:1.9rem}
+  .dcard-ttl{font-size:.83rem}
+  .dcard-desc{font-size:.68rem}
+  .final-card{padding:1.8rem 1.2rem}
+  .sign-box{padding:.8rem 1.2rem}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<!-- Ambient particle canvas -->
+<canvas id="cv"></canvas>
+
+<!-- Rose decorations (always visible) -->
+<div class="rose-deco rd1">🌹</div>
+<div class="rose-deco rd2">🌸</div>
+<div class="rose-deco rd3">🌹</div>
+<div class="rose-deco rd4">🌸</div>
+<div class="rose-deco rd5">🌹</div>
+<div class="rose-deco rd6">🌸</div>
+<div class="rose-deco rd7">🌸</div>
+<div class="rose-deco rd8">🌹</div>
+
+<!-- ══ SCREEN 1: LANDING ══════════════════════════════════ -->
+<section id="s1" class="screen active">
+  <div class="land-wrap">
+    <div class="bear-outer">
+      <span class="bear-emoji" id="bearEmoji">🐻</span>
+      <div class="sign-box">
+        <div class="sign-text">Do you want to be<br/>my girlfriend?</div>
+        <div class="sign-sub">💕 tap YES to continue 💕</div>
+      </div>
+      <div class="bear-shadow"></div>
+    </div>
+
+    <div class="btn-row" id="btnRow">
+      <button class="btn btn-yes" onclick="handleYes()">Yes! 💖</button>
+      <button class="btn btn-no" id="noBtn">No 🙈</button>
+    </div>
+
+    <div class="hint-text">404: loneliness not found ✨</div>
+  </div>
+</section>
+
+<!-- ══ SCREEN 2: CALENDAR ═════════════════════════════════ -->
+<section id="s2" class="screen">
+  <div class="s-inner">
+    <div class="s-head">
+      <span class="s-icon">🗓️</span>
+      <h2 class="s-title">You said <span class="hi">YES!</span> 💖</h2>
+      <p class="s-sub">When do you want our first date?</p>
+    </div>
+
+    <div class="cal-card">
+      <div class="cal-nav">
+        <button class="cal-arr" id="calPrev">‹</button>
+        <span class="cal-month" id="calLbl"></span>
+        <button class="cal-arr" id="calNext">›</button>
+      </div>
+      <div class="cal-wdays">
+        <span>Su</span><span>Mo</span><span>Tu</span><span>We</span>
+        <span>Th</span><span>Fr</span><span>Sa</span>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="cal-lbl" id="calSelLbl">Pick a day ✨</div>
+    </div>
+
+    <button class="btn btn-yes" id="btnCal" onclick="goDates()" disabled>
+      Let's Plan It 💌
+    </button>
+  </div>
+</section>
+
+<!-- ══ SCREEN 3: DATE TYPE ════════════════════════════════ -->
+<section id="s3" class="screen">
+  <div class="s-inner">
+    <div class="s-head">
+      <span class="s-icon">💞</span>
+      <h2 class="s-title">What kind of date?</h2>
+      <p class="s-sub">Choose your dream evening with me…</p>
+    </div>
+
+    <div class="dcards">
+      <div class="dcard" data-t="movie" onclick="pickType(this)">
+        <div class="dcard-glow"></div>
+        <span class="dcard-em">🎬</span>
+        <div class="dcard-ttl">Movie Date</div>
+        <div class="dcard-desc">Cozy cinema, popcorn & your hand to hold</div>
+      </div>
+      <div class="dcard" data-t="coffee" onclick="pickType(this)">
+        <div class="dcard-glow"></div>
+        <span class="dcard-em">☕</span>
+        <div class="dcard-ttl">Coffee Date</div>
+        <div class="dcard-desc">Warm lattes and endless conversation</div>
+      </div>
+      <div class="dcard" data-t="picnic" onclick="pickType(this)">
+        <div class="dcard-glow"></div>
+        <span class="dcard-em">🌙</span>
+        <div class="dcard-ttl">Picnic Under Stars</div>
+        <div class="dcard-desc">Blankets, fairy lights & the whole night sky</div>
+      </div>
+      <div class="dcard" data-t="walk" onclick="pickType(this)">
+        <div class="dcard-glow"></div>
+        <span class="dcard-em">🌸</span>
+        <div class="dcard-ttl">Long Walk Together</div>
+        <div class="dcard-desc">Nowhere to be — just us and the breeze</div>
+      </div>
+    </div>
+
+    <button class="btn btn-yes" id="btnType" onclick="goFinal()" disabled>
+      This one! 💖
+    </button>
+  </div>
+</section>
+
+<!-- ══ SCREEN 4: FINAL ════════════════════════════════════ -->
+<section id="s4" class="screen">
+  <div class="fhearts" id="fhearts"></div>
+  <div class="final-wrap">
+    <div class="final-card">
+      <span class="final-rib">💌</span>
+      <h2 class="final-title">It's a date! 💖</h2>
+      <p class="final-msg" id="fMsg"></p>
+      <div class="final-det" id="fDet"></div>
+      <div class="final-quote">
+        "Every love story is beautiful,<br/>but ours will be my favourite."
+      </div>
+      <div class="music-btn" onclick="toggleMusic()">🎵 Play Music</div>
+      <br/>
+      <button class="btn btn-yes btn-replay" onclick="replay()">Replay ✨</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ EASTER EGG TOAST ═══════════════════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<!-- ══ SECRET OVERLAY ════════════════════════════════════ -->
+<div class="secret-ov" id="secOv">
+  <div class="secret-card">
+    <div class="sc-em">💻❤️</div>
+    <div class="sc-ttl">You found the developer's heart!</div>
+    <div class="sc-sub">You typed L‑O‑V‑E…<br/>a true programmer in love.</div>
+    <div class="sc-code">
+      <span class="cl"><span class="cm">// runtime analysis</span></span>
+      <span class="cl"><span class="kw">const</span> love = <span class="st">"unconditional"</span>;</span>
+      <span class="cl"><span class="kw">while</span> (life.continues()) {</span>
+      <span class="cl">&nbsp;&nbsp;cherish(you); <span class="cm">// O(∞)</span></span>
+      <span class="cl">}</span>
+      <span class="cl"><span class="cm">// Space complexity: O(my heart)</span></span>
+    </div>
+    <button class="sc-close" onclick="closeSecret()">Close 💕</button>
+  </div>
+</div>
+
+<script>
+/* ── STATE ──────────────────────────────────── */
+const ST = {selDate:null,selType:null,clicks:0,keySeq:'',music:false};
+const screens = [s1,s2,s3,s4]; // direct DOM refs from id
+
+/* ── PARTICLE CANVAS ────────────────────────── */
+!(function(){
+  const c=document.getElementById('cv'),x=c.getContext('2d');
+  const H=['💗','💕','💖','💓','🌸','✨','💞','🌹'];
+  let W,Ht,ps=[];
+  function resize(){W=c.width=innerWidth;Ht=c.height=innerHeight}
+  resize();addEventListener('resize',resize);
+  function mk(){return{x:Math.random()*W,y:Ht+30,ch:H[~~(Math.random()*H.length)],
+    sz:10+Math.random()*16,vx:(Math.random()-.5)*.5,vy:-(0.35+Math.random()*.55),
+    a:.5+Math.random()*.45,r:Math.random()*Math.PI*2,rv:(Math.random()-.5)*.018}}
+  for(let i=0;i<20;i++){const p=mk();p.y=Math.random()*Ht;ps.push(p)}
+  let last=0;
+  (function loop(ts){
+    x.clearRect(0,0,W,Ht);
+    if(ts-last>750&&ps.length<32){ps.push(mk());last=ts}
+    ps=ps.filter(p=>p.a>0.015);
+    ps.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;p.r+=p.rv;p.a-=.0015;
+      x.save();x.globalAlpha=p.a;x.translate(p.x,p.y);x.rotate(p.r);
+      x.font=p.sz+'px serif';x.textAlign='center';x.textBaseline='middle';
+      x.fillText(p.ch,0,0);x.restore();
+    });
+    requestAnimationFrame(loop);
+  })(0);
+})();
+
+/* ── NO BUTTON EVASION ──────────────────────── */
+!(function(){
+  const btn=document.getElementById('noBtn');
+  let placed=false;
+  function flee(e){
+    const pad=14,bw=btn.offsetWidth||110,bh=btn.offsetHeight||46;
+    let nx,ny;
+    // try to pick a corner far from cursor
+    const cx=e.clientX||innerWidth/2,cy=e.clientY||innerHeight/2;
+    const opts=[
+      {x:pad,y:pad},{x:innerWidth-bw-pad,y:pad},
+      {x:pad,y:innerHeight-bh-pad},{x:innerWidth-bw-pad,y:innerHeight-bh-pad},
+      {x:innerWidth/2-bw/2,y:pad},{x:pad,y:innerHeight/2-bh/2},
+      {x:innerWidth-bw-pad,y:innerHeight/2-bh/2},
+    ];
+    let best=opts[0],bestD=0;
+    opts.forEach(o=>{
+      const d=Math.hypot(o.x+bw/2-cx,o.y+bh/2-cy);
+      if(d>bestD){bestD=d;best=o;}
+    });
+    // add small random offset so it doesn't always go exactly to corner
+    nx=best.x+(Math.random()-0.5)*60;
+    ny=best.y+(Math.random()-0.5)*40;
+    nx=Math.max(pad,Math.min(innerWidth-bw-pad,nx));
+    ny=Math.max(pad,Math.min(innerHeight-bh-pad,ny));
+    btn.style.position='fixed';
+    btn.style.left=nx+'px';btn.style.top=ny+'px';
+    btn.style.transition='left .22s ease,top .22s ease';
+    placed=true;
+  }
+  btn.addEventListener('mouseover',flee);
+  btn.addEventListener('touchstart',e=>{e.preventDefault();flee(e.touches[0]);},{passive:false});
+  setTimeout(()=>{
+    btn.style.position='fixed';
+    btn.style.left=(innerWidth-220)+'px';
+    btn.style.top=(innerHeight/2-23)+'px';
+  },1100);
+})();
+
+/* ── SCREEN TRANSITIONS ─────────────────────── */
+function goTo(idx){
+  screens.forEach((s,i)=>{
+    s.classList.remove('active','out');
+    if(i===idx)s.classList.add('active');
+  });
+}
+function outThen(idx){
+  const cur=screens.findIndex(s=>s.classList.contains('active'));
+  if(cur>=0){screens[cur].classList.add('out');}
+  setTimeout(()=>goTo(idx),520);
+}
+
+/* ── YES ────────────────────────────────────── */
+function handleYes(){
+  const b=document.querySelector('.btn-yes');
+  const r=b.getBoundingClientRect();
+  burst(r.left+r.width/2,r.top+r.height/2,14);
+  document.getElementById('bearEmoji').style.animation='none';
+  setTimeout(()=>{document.getElementById('bearEmoji').textContent='🥰'},200);
+  setTimeout(()=>outThen(1),700);
+}
+
+/* ── CALENDAR ───────────────────────────────── */
+const MONTHS=['January','February','March','April','May','June',
+  'July','August','September','October','November','December'];
+const calV={y:new Date().getFullYear(),m:new Date().getMonth()};
+
+function buildCal(){
+  const {y,m}=calV;
+  document.getElementById('calLbl').textContent=MONTHS[m]+' '+y;
+  const g=document.getElementById('calGrid');g.innerHTML='';
+  const today=new Date();today.setHours(0,0,0,0);
+  const first=new Date(y,m,1).getDay();
+  const days=new Date(y,m+1,0).getDate();
+  for(let i=0;i<first;i++){const e=document.createElement('div');e.className='cday empty';g.appendChild(e);}
+  for(let d=1;d<=days;d++){
+    const el=document.createElement('div');
+    const dt=new Date(y,m,d);
+    el.className='cday'+(dt<today?' past':'')+(dt.toDateString()===today.toDateString()?' today':'');
+    el.textContent=d;
+    if(dt>=today)el.addEventListener('click',()=>pickDay(d,el,dt));
+    g.appendChild(el);
+  }
+}
+function pickDay(d,el,dt){
+  document.querySelectorAll('.cday.sel').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel');ST.selDate=dt;
+  document.getElementById('calSelLbl').textContent='💖 '+dt.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('btnCal').disabled=false;
+}
+document.getElementById('calPrev').onclick=()=>{
+  calV.m--;if(calV.m<0){calV.m=11;calV.y--;}buildCal();
+};
+document.getElementById('calNext').onclick=()=>{
+  calV.m++;if(calV.m>11){calV.m=0;calV.y++;}buildCal();
+};
+buildCal();
+
+/* ── DATE TYPE ──────────────────────────────── */
+function pickType(el){
+  document.querySelectorAll('.dcard.pick').forEach(c=>c.classList.remove('pick'));
+  el.classList.add('pick');ST.selType=el.dataset.t;
+  document.getElementById('btnType').disabled=false;
+  burst(el.getBoundingClientRect().left+el.offsetWidth/2,
+        el.getBoundingClientRect().top+el.offsetHeight/2,6);
+}
+
+/* ── TRANSITIONS ────────────────────────────── */
+function goDates(){burst(innerWidth/2,innerHeight/2,8);setTimeout(()=>outThen(2),300)}
+
+/* ── FINAL ──────────────────────────────────── */
+const MSGS={
+  movie:'Cinema lights down, your face glowing — that\'s my favourite view 🎬',
+  coffee:'Two cups, one cozy table, all the time in the world for us ☕',
+  picnic:'Blanket for two, the whole sky above us, no reason to ever go home 🌙',
+  walk:'Every step together feels like home. I can\'t wait to get lost with you 🌸',
+};
+const LBLS={movie:'Movie Date 🎬',coffee:'Coffee Date ☕',picnic:'Picnic Under Stars 🌙',walk:'Long Walk Together 🌸'};
+
+function goFinal(){
+  outThen(3);
+  const ds=ST.selDate?ST.selDate.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'}):'our special day';
+  document.getElementById('fMsg').textContent=MSGS[ST.selType]||'';
+  document.getElementById('fDet').innerHTML='📅 '+ds+'<br/>🎉 '+LBLS[ST.selType];
+  setTimeout(()=>launchHearts(),700);
+}
+
+function launchHearts(){
+  const c=document.getElementById('fhearts');c.innerHTML='';
+  const CH=['💖','💕','💗','🌸','✨','💓','🌹','💞'];
+  function spawn(){
+    const el=document.createElement('div');
+    const sz=14+Math.random()*22,x=Math.random()*100,
+          dur=5+Math.random()*6,delay=Math.random()*2,
+          dx=(Math.random()-.5)*130,rot=(Math.random()-.5)*400;
+    el.style.cssText=`position:absolute;left:${x}vw;bottom:-30px;font-size:${sz}px;
+      animation:floatUp ${dur}s ${delay}s linear forwards;
+      --dx:${dx}px;--rot:${rot}deg;pointer-events:none;`;
+    el.textContent=CH[~~(Math.random()*CH.length)];
+    c.appendChild(el);
+    setTimeout(()=>el.remove(),(dur+delay)*1000+500);
+  }
+  for(let i=0;i<18;i++)setTimeout(spawn,i*160);
+  const iv=setInterval(spawn,650);
+  setTimeout(()=>clearInterval(iv),14000);
+}
+
+/* ── MUSIC ──────────────────────────────────── */
+function toggleMusic(){
+  showToast('🎵 Imagine the most romantic song playing right now… 🎶');
+}
+
+/* ── REPLAY ─────────────────────────────────── */
+function replay(){
+  ST.selDate=null;ST.selType=null;
+  document.getElementById('btnCal').disabled=true;
+  document.getElementById('btnType').disabled=true;
+  document.getElementById('calSelLbl').textContent='Pick a day ✨';
+  document.querySelectorAll('.cday.sel').forEach(e=>e.classList.remove('sel'));
+  document.querySelectorAll('.dcard.pick').forEach(e=>e.classList.remove('pick'));
+  document.getElementById('fhearts').innerHTML='';
+  document.getElementById('bearEmoji').textContent='🐻';
+  document.getElementById('bearEmoji').style.animation='';
+  buildCal();
+  outThen(0);
+  // reset no button
+  setTimeout(()=>{
+    const b=document.getElementById('noBtn');
+    b.style.position='fixed';
+    b.style.left=(innerWidth-220)+'px';
+    b.style.top=(innerHeight/2-23)+'px';
+    b.style.transition='none';
+  },600);
+}
+
+/* ── BURST HEARTS ───────────────────────────── */
+function burst(cx,cy,n=10){
+  const CH=['💖','💗','💕','✨','🌸','💓'];
+  for(let i=0;i<n;i++){
+    const el=document.createElement('div');
+    const a=(i/n)*Math.PI*2,d=50+Math.random()*90;
+    el.style.cssText=`position:fixed;left:${cx}px;top:${cy}px;
+      font-size:${16+Math.random()*14}px;pointer-events:none;z-index:9999;
+      animation:hBurst .85s ease-out forwards;
+      --bx:${Math.cos(a)*d}px;--by:${Math.sin(a)*d}px;`;
+    el.textContent=CH[~~(Math.random()*CH.length)];
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),900);
+  }
+}
+
+/* ── CLICK RIPPLE ───────────────────────────── */
+document.addEventListener('click',e=>{
+  const r=document.createElement('div');
+  r.style.cssText=`position:fixed;left:${e.clientX}px;top:${e.clientY}px;
+    width:8px;height:8px;margin:-4px;
+    background:rgba(240,98,146,.45);border-radius:50%;
+    pointer-events:none;z-index:9998;
+    animation:ripOut .5s ease-out forwards;`;
+  document.body.appendChild(r);
+  setTimeout(()=>r.remove(),520);
+});
+
+/* ── TOAST ──────────────────────────────────── */
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('on');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('on'),3600);
+}
+
+/* ── SECRET ─────────────────────────────────── */
+function openSecret(){document.getElementById('secOv').classList.add('open')}
+function closeSecret(){document.getElementById('secOv').classList.remove('open')}
+
+/* ── EASTER EGGS ────────────────────────────── */
+const JOKES=[
+  'O(n) love complexity detected 💘',
+  'git commit -m "found the one" ✅',
+  'Compilation successful: relationship.exe 💻',
+  'Warning: feelings.overflow() 💖',
+  'sudo apt-get install love — already installed ✨',
+  'Exception: TooMuchCutenessError 🌸',
+  'undefined is not loneliness 💕',
+  'npm install happiness — 0 vulnerabilities 🎉',
+];
+let jokeIdx=0,bgClicks=0,bgTimer;
+
+// 1. Background clicks
+document.addEventListener('click',e=>{
+  if(e.target.closest('button')||e.target.closest('.cday')||e.target.closest('.dcard'))return;
+  bgClicks++;clearTimeout(bgTimer);
+  bgTimer=setTimeout(()=>bgClicks=0,2500);
+  if(bgClicks>=5){bgClicks=0;showToast(JOKES[jokeIdx++%JOKES.length]);}
+});
+
+// 2. Console messages
+console.log('%c💖 true love === true  // always',
+  'color:#e84989;font-size:14px;font-family:monospace;font-weight:bold;');
+console.log('%c// Hint: this site has 5 easter eggs. Find them all.',
+  'color:#ad5174;font-size:12px;font-family:monospace;');
+console.log('%cif (you.clicked === "yes") { happiness = Infinity; }',
+  'color:#f06292;font-size:12px;font-family:monospace;');
+
+// 3. Type LOVE to unlock secret
+let seq='';
+document.addEventListener('keydown',e=>{
+  seq=(seq+e.key.toUpperCase()).slice(-4);
+  if(seq==='LOVE'){openSecret();seq='';}
+  // Konami code
+  konami(e.key);
+});
+
+// 4. Bear hover
+document.getElementById('bearEmoji').addEventListener('mouseenter',function(){
+  if(!this._seen){this._seen=true;showToast('🐻 You found me! 404: loneliness not found');}
+});
+
+// 5. Konami code
+const KK=['ArrowUp','ArrowUp','ArrowDown','ArrowDown',
+  'ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let ki=0;
+function konami(k){
+  if(k===KK[ki]){ki++;if(ki===KK.length){ki=0;showToast('🎮 Konami! cheat code: infinite_love=true');burst(innerWidth/2,innerHeight/2,22);}}
+  else ki=0;
+}
+</script>
+</body>
+</html>
